@@ -4,7 +4,7 @@ class UserControllers {
   async getAllUser(req, res) {
     try {
       const result = await User.findAll({
-        attributes: ["id", "name", "last_name", "password", "is_active","mail", "registration_date", "removed_date"],
+        attributes: ["id", "name", "last_name", "email", "roleid", "is_active"],
         include: {
           model: Role,
           attributes: ["name"],
@@ -19,20 +19,25 @@ class UserControllers {
     try {
       const {id} = req.params;
       const result = await User.findByPk(id);
+      attributes: { exclude: ['password'] } // Excluye el campo 'password' de la consulta
       res.status(200).send({ success: true, message: result });
     } catch (error) {
+      console.error(error);
       res.status(400).send({ success: false, message: error });
     }
   }
 
   async createUser(req, res) {
     try {
-      const { name, mail, password, roleId } = req.body;
+      const {id, name, last_name, email, password, roleid, is_active} = req.body;
       const result = await User.create({
-        name,
-        mail,
-        password,
-        roleId,
+        id, 
+        name, 
+        last_name, 
+        email, 
+        password, 
+        roleid,
+        is_active
       });
       res.status(200).send({
         success: true,
@@ -45,9 +50,9 @@ class UserControllers {
   async updateUser(req, res) {
     try {
       const { id } = req.params;
-      const { name, mail, password } = req.body;
+      const { name, last_name, email, password, roleid, is_active} = req.body;
       const result = await User.update(
-        { name, mail, password },
+        { name, last_name, email, password, roleid, is_active},
         {
           where: {
             id,

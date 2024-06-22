@@ -7,9 +7,9 @@ User.init(
   {
     id: {
       type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
       allowNull: false,
-      primaryKey: true,   // clave primaria
-      autoIncrement: true //id se incremente automáticamente
     },
     name: {
       type: DataTypes.STRING(25),
@@ -27,30 +27,25 @@ User.init(
       type: DataTypes.STRING(255),
       allowNull: false,
     },
-    roleId: {
+    roleid: {
       type: DataTypes.INTEGER,
       references: {
-        model: 'Role',
-        key: 'id'
+        model: 'role',
+        key: 'roleid'
       }
+    },
+    is_active: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: true,
+    },
   },
-  is_Active: {
-    type: DataTypes.BOOLEAN,
-    allowNull: false,
-    defaultValue: true,
-  },
-  registration_date: {
-    type: DataTypes.DATE,
-    allowNull: false,
-    defaultValue: Sequelize.NOW,
-  },
-  removed_date: {
-    type: DataTypes.DATE,
-    allowNull: true,
-    defaultValue: null,
-  },
-  sequelize: connection,
+  {
+    sequelize: connection,
     modelName: "User",
+    tableName: "user", // Especifica el nombre de la tabla aquí
+    timestamps: true,
+    underscored: true 
   }
 );
 

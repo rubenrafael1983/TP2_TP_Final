@@ -6,4 +6,5 @@ User.belongsTo(Role, {foreignKey:"roleId"})
 
 
 
-export {Role, User}
+
+export {Role, User};
