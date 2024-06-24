@@ -1,4 +1,5 @@
 import { User, Role } from "../Models/models.js";
+import { genToken, verifyToken } from "../utils/token.js";
 
 class UserControllers {
   async getAllUser(req, res) {
@@ -35,16 +36,16 @@ class UserControllers {
         name, 
         last_name, 
         email, 
-        password, 
-        roleid,
-        is_active
-      });
-      res.status(200).send({
-        success: true,
-        message: `usuario ${result.dataValues.name} creado con exito`,
-      });
-    } catch (error) {
-      res.status(400).send({ success: false, message: error });
+          password, 
+          roleid,
+          is_active
+        });
+        res.status(200).send({
+          success: true,
+          message: `usuario ${result.dataValues.name} creado con exito`,
+        });
+      } catch (error) {
+        res.status(400).send({ success: false, message: error });
     }
   }
   async updateUser(req, res) {
@@ -83,6 +84,43 @@ class UserControllers {
       res.status(400).send({ success: false, message: error });
     }
   }
+
+  login = async (req, res) => {
+    try {
+      const { email, password } = req.body;
+      const data = await User.findOne({
+        where: {
+          email,
+        },
+      });      
+      if (!data) throw new Error("no podes pasar");
+      const comparePass = await data.comparePass(password);
+      
+      if (!comparePass) throw new Error("no podes pasar");
+      const payload = {
+        id: data.id,
+        name: data.name,
+      };
+      const token = genToken(payload);
+      console.log("🚀 ~ UserControllers ~ login= ~ genToken:", genToken)
+      
+      res.cookie("token", token);
+      res
+        .status(200)
+        .send({ success: true, message: "usuario logueado con exito" });
+    } catch (error) {
+      res.status(400).send({ success: false, message: error.message});
+    }
+  };
+
+  me = async (req, res) => {
+    try {
+      const { user } = req;
+      res.status(200).send({ success: true, message: user });
+    } catch (error) {
+      res.status(400).send({ success: false, message: error.message });
+    }
+  };
 }
 
 export default UserControllers;
